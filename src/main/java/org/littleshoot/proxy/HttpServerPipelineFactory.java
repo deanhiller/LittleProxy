@@ -235,7 +235,8 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory,
         }
         */
 
-        HttpRequestHandler httpRequestHandler = new HttpRequestHandler(this.cacheManager, authenticationManager,
+        final HttpRequestHandler httpRequestHandler = 
+            new HttpRequestHandler(this.cacheManager, authenticationManager,
             this.channelGroup, this.clientSocketChannelFactory,
             this.chainProxyManager, relayPipelineFactoryFactory, this.useJmx, this.requestFilter);
         
