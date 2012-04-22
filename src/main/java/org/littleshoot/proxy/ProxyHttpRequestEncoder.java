@@ -17,7 +17,6 @@ public class ProxyHttpRequestEncoder extends HttpRequestEncoder {
     private static final Logger LOG = 
         LoggerFactory.getLogger(ProxyHttpRequestEncoder.class);
     private final HttpRelayingHandler relayingHandler;
-    private final HttpRequestFilter requestFilter;
     private final boolean keepProxyFormat;
     private final boolean transparent;
 
@@ -29,7 +28,7 @@ public class ProxyHttpRequestEncoder extends HttpRequestEncoder {
      * and response pair.
      */
     public ProxyHttpRequestEncoder(final HttpRelayingHandler handler) {
-        this(handler, null, false, false);
+        this(handler, false, false);
     }
     
     /**
@@ -42,9 +41,8 @@ public class ProxyHttpRequestEncoder extends HttpRequestEncoder {
      * @param requestFilter The filter for requests.
      */
     public ProxyHttpRequestEncoder(final HttpRelayingHandler handler, 
-        final HttpRequestFilter requestFilter, 
         final boolean keepProxyFormat) {
-        this(handler, requestFilter, keepProxyFormat, false);
+        this(handler, keepProxyFormat, false);
     }
     
     /**
@@ -60,12 +58,10 @@ public class ProxyHttpRequestEncoder extends HttpRequestEncoder {
      * proxy rules.
      */
     public ProxyHttpRequestEncoder(final HttpRelayingHandler handler, 
-        final HttpRequestFilter requestFilter, 
         final boolean keepProxyFormat,
         final boolean transparent) {
 	
         this.relayingHandler = handler;
-        this.requestFilter = requestFilter;
         this.keepProxyFormat = keepProxyFormat;
         this.transparent = transparent;
     }
@@ -89,9 +85,6 @@ public class ProxyHttpRequestEncoder extends HttpRequestEncoder {
                 toSend = request;
             } else {
                 toSend = ProxyUtils.copyHttpRequest(request, keepProxyFormat);
-            }
-            if (this.requestFilter != null) {
-                this.requestFilter.filter(toSend);
             }
             //LOG.info("Writing modified request: {}", httpRequestCopy);
             return super.encode(ctx, channel, toSend);

@@ -119,7 +119,7 @@ public class ProxyUtils {
 
     public static final HttpRequestFilter PASS_THROUGH_REQUEST_FILTER = 
         new HttpRequestFilter() {
-            public void filter(final HttpRequest httpRequest) {
+            public void filter(final HttpRequest httpRequest, Channel channel) {
             }
         };
     

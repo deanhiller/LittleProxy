@@ -29,7 +29,6 @@ public class DefaultRelayPipelineFactory implements ChannelPipelineFactory {
     private final Channel browserToProxyChannel;
 
     private final ChannelGroup channelGroup;
-    private final HttpRequestFilter requestFilter;
     private final ChainProxyManager chainProxyManager;
     private final boolean filtersOff;
     private final HttpResponseFilters responseFilters;
@@ -40,7 +39,6 @@ public class DefaultRelayPipelineFactory implements ChannelPipelineFactory {
         final Channel browserToProxyChannel,
         final ChannelGroup channelGroup, 
         final HttpResponseFilters responseFilters, 
-        final HttpRequestFilter requestFilter, 
         final ChainProxyManager chainProxyManager) {
         this.hostAndPort = hostAndPort;
         this.httpRequest = httpRequest;
@@ -49,7 +47,6 @@ public class DefaultRelayPipelineFactory implements ChannelPipelineFactory {
         
         this.channelGroup = channelGroup;
         this.responseFilters = responseFilters;
-        this.requestFilter = requestFilter;
         this.chainProxyManager = chainProxyManager;
         
         this.filtersOff = responseFilters == null;
@@ -125,7 +122,7 @@ public class DefaultRelayPipelineFactory implements ChannelPipelineFactory {
         }
         
         final ProxyHttpRequestEncoder encoder = 
-            new ProxyHttpRequestEncoder(handler, requestFilter, 
+            new ProxyHttpRequestEncoder(handler,  
                 chainProxyManager != null
                 && chainProxyManager.getChainProxy(httpRequest) != null);
         pipeline.addLast("encoder", encoder);

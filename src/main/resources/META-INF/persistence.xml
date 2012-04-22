@@ -1,0 +1,76 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+			 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+					http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+			 version="1.0">
+	<persistence-unit name="h2">
+	  <provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<properties>
+			<property name="transaction.flush_before_completion" value="true"/>
+			<property name="hibernate.connection.username" value="sa"/>
+      		<property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
+      		<property name="hibernate.connection.password" value=""/>
+      		<property name="hibernate.connection.url" value="should-set-in-test-itself"/>
+      		<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+      		<property name="hibernate.show_sql" value="false"/>
+      		<property name="hibernate.hbm2ddl.auto" value="update"/>
+      </properties>
+   </persistence-unit>			 
+	<persistence-unit name="postgres">
+	  <provider>org.hibernate.ejb.HibernatePersistence</provider>
+      <properties>
+         <property name="hibernate.hbm2ddl.auto" value="update"/>
+	     <property name="transaction.flush_before_completion" value="true"/>
+         <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+         <property name="hibernate.connection.driver_class" value="net.sf.log4jdbc.DriverSpy"/>
+         <property name="hibernate.connection.username" value="application"/>
+         <property name="hibernate.connection.password" value="application123"/>
+         <property name="hibernate.connection.url" value="jdbc:log4jdbc:postgresql://127.0.0.1/requirements"/>
+         <property name="hibernate.max_fetch_depth" value="3"/>
+         <property name="hibernate.show_sql" value="false"/>
+		 <property name="hibernate.format_sql" value="true"/>
+         <property name="hibernate.order_updates" value="true"/>
+         <property name="hibernate.default_batch_fetch_size" value="100"/>
+         <property name="hibernate.jdbc.batch_versioned_data" value="true"/>
+         <property name="hibernate.jdbc.use_streams_for_binary" value="true"/>
+         <property name="hibernate.cache.region_prefix" value="hibernate.test"/>
+         <property name="hibernate.cache.use_query_cache" value="true"/>
+         <property name="hibernate.cache.provider_class" value="org.hibernate.cache.HashtableCacheProvider"/>
+         <property name="hibernate.query.substitutions" value="true 1, false 0, yes 'Y', no 'N'"/>
+             
+         <!-- ENVERS configuration... -->
+   <!-- <property name="hibernate.ejb.event.post-insert"
+             value="org.hibernate.ejb.event.EJB3PostInsertEventListener,org.hibernate.envers.event.AuditEventListener" />
+   <property name="hibernate.ejb.event.post-update"
+             value="org.hibernate.ejb.event.EJB3PostUpdateEventListener,org.hibernate.envers.event.AuditEventListener" />
+   <property name="hibernate.ejb.event.post-delete"
+             value="org.hibernate.ejb.event.EJB3PostDeleteEventListener,org.hibernate.envers.event.AuditEventListener" />
+   <property name="hibernate.ejb.event.pre-collection-update"
+             value="org.hibernate.envers.event.AuditEventListener" />
+   <property name="hibernate.ejb.event.pre-collection-remove"
+             value="org.hibernate.envers.event.AuditEventListener" />
+   property name="hibernate.ejb.event.post-collection-recreate"
+             value="org.hibernate.envers.event.AuditEventListener" /> -->
+
+		 <!-- configuration pool via c3p0-->
+         <property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider"/>
+         <property name="hibernate.c3p0.preferredTestQuery" value="select 1"/>
+         <property name="hibernate.c3p0.max_size" value="20"/>
+         <property name="hibernate.c3p0.min_size" value="5"/>
+         <property name="hibernate.c3p0.acquireRetryAttempts" value="0"/>
+         <property name="hibernate.c3p0.acquireRetryDelay" value="10000"/>
+
+         <!-- property name="hibernate.c3p0.acquire_increment" value="3"/>
+         <property name="hibernate.c3p0.idle_test_period" value="101"/>
+         <property name="hibernate.c3p0.max_statements" value="0"/>
+         <property name="hibernate.c3p0.timeout" value="301"/>
+         
+         <property name="hibernate.c3p0.breakAfterAcquireFailure" value="false"/>
+         <property name="hibernate.c3p0.testConnectionOnCheckout" value="true"/>
+         <property name="hibernate.c3p0.maxConnectionAge" value="3601"/>
+         <property name="hibernate.c3p0.checkoutTimeout" value="100"/-->
+		 <!-- DEPRECATED very expensive property name="hibernate.c3p0.validate>--> 
+
+      </properties>
+   </persistence-unit>
+</persistence>

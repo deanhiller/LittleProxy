@@ -10,18 +10,15 @@ public class DefaultRelayPipelineFactoryFactory
     
     private final ChainProxyManager chainProxyManager;
     private final ChannelGroup channelGroup;
-    private final HttpRequestFilter requestFilter;
     private final HttpResponseFilters responseFilters;
 
     public DefaultRelayPipelineFactoryFactory(
         final ChainProxyManager chainProxyManager, 
         final HttpResponseFilters responseFilters, 
-        final HttpRequestFilter requestFilter, 
         final ChannelGroup channelGroup) {
         this.chainProxyManager = chainProxyManager;
         this.responseFilters = responseFilters;
         this.channelGroup = channelGroup;
-        this.requestFilter = requestFilter;
     }
     
     public ChannelPipelineFactory getRelayPipelineFactory(
@@ -36,7 +33,7 @@ public class DefaultRelayPipelineFactoryFactory
         
         return new DefaultRelayPipelineFactory(hostAndPort, httpRequest, 
             relayListener, browserToProxyChannel, channelGroup, responseFilters, 
-            requestFilter, chainProxyManager);
+            chainProxyManager);
     }
     
 }

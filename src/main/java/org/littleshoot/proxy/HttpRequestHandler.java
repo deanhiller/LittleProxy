@@ -99,6 +99,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler
     private final boolean useJmx;
     
     private final RelayPipelineFactoryFactory relayPipelineFactoryFactory;
+	private HttpRequestFilter requestFilter;
     
     /**
      * Creates a new class for handling HTTP requests with no frills.
@@ -109,7 +110,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler
         final ClientSocketChannelFactory clientChannelFactory,
         final RelayPipelineFactoryFactory relayPipelineFactoryFactory) {
         this(null, null, null, clientChannelFactory, null, 
-            relayPipelineFactoryFactory, false);
+            relayPipelineFactoryFactory, false, null);
     }
     
     /**
@@ -130,7 +131,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler
         final ClientSocketChannelFactory clientChannelFactory,
         final RelayPipelineFactoryFactory relayPipelineFactoryFactory) {
         this(cacheManager, authorizationManager, channelGroup,
-            clientChannelFactory, null, relayPipelineFactoryFactory, false);
+            clientChannelFactory, null, relayPipelineFactoryFactory, false, null);
     }
     
     /**
@@ -155,7 +156,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler
         final ClientSocketChannelFactory clientChannelFactory,
         final ChainProxyManager chainProxyManager, 
         final RelayPipelineFactoryFactory relayPipelineFactoryFactory,
-        final boolean useJmx) {
+        final boolean useJmx, HttpRequestFilter requestFilter) {
         this.cacheManager = cacheManager;
         this.authorizationManager = authorizationManager;
         this.channelGroup = channelGroup;
@@ -163,6 +164,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler
         this.chainProxyManager = chainProxyManager;
         this.relayPipelineFactoryFactory = relayPipelineFactoryFactory;
         this.useJmx = useJmx;
+        this.requestFilter = requestFilter;
         if (useJmx) {
             setupJmx();
         }
@@ -261,6 +263,9 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler
             log.info("Not authorized!!");
             return;
         }
+        
+        if(requestFilter != null) 
+        	requestFilter.filter(request, inboundChannel);
         
         String hostAndPort = null;
         if (this.chainProxyManager != null) {

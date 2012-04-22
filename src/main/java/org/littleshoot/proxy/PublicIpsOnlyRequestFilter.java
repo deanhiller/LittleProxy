@@ -3,6 +3,7 @@ package org.littleshoot.proxy;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ public class PublicIpsOnlyRequestFilter implements HttpRequestFilter {
     
     private final Logger log = LoggerFactory.getLogger(getClass());
     
-    public void filter(final HttpRequest request) {
+    public void filter(final HttpRequest request, Channel channel) {
         final String host = ProxyUtils.parseHost(request);
         try {
             final InetAddress ia = InetAddress.getByName(host);

@@ -69,6 +69,8 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory,
     private boolean useJmx;
     
     private final RelayPipelineFactoryFactory relayPipelineFactoryFactory;
+
+	private HttpRequestFilter requestFilter;
     
     private static final Timer TIMER = new HashedWheelTimer();
 
@@ -81,15 +83,17 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory,
      * @param filters HTTP filters to apply.
      * @param chainProxyManager upstream proxy server host and port or 
      * <code>null</code> if none used.
+     * @param requestFilter 
      * @param isSsl Whether or not to use SSL/TLS.
      */
     public HttpServerPipelineFactory(
         final ProxyAuthorizationManager authorizationManager, 
         final ChannelGroup channelGroup, 
         final ChainProxyManager chainProxyManager, final KeyStoreManager ksm,
-        final RelayPipelineFactoryFactory relayPipelineFactoryFactory) {
+        final RelayPipelineFactoryFactory relayPipelineFactoryFactory, HttpRequestFilter requestFilter) {
     	
     	this.relayPipelineFactoryFactory = relayPipelineFactoryFactory;
+    	this.requestFilter = requestFilter;
     	
         log.info("Creating server with keystore manager: {}", ksm);
         this.authenticationManager = authorizationManager;
@@ -233,7 +237,7 @@ public class HttpServerPipelineFactory implements ChannelPipelineFactory,
 
         HttpRequestHandler httpRequestHandler = new HttpRequestHandler(this.cacheManager, authenticationManager,
             this.channelGroup, this.clientSocketChannelFactory,
-            this.chainProxyManager, relayPipelineFactoryFactory, this.useJmx);
+            this.chainProxyManager, relayPipelineFactoryFactory, this.useJmx, this.requestFilter);
         
         pipeline.addLast("idle", new IdleStateHandler(TIMER, 0, 0, 70));
         //pipeline.addLast("idleAware", new IdleAwareHandler("Client-Pipeline"));

@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 
 /**
@@ -84,7 +85,7 @@ public class RegexHttpRequestFilter implements HttpRequestFilter {
         this.filter = filter;
     }
     
-    public void filter(final HttpRequest httpRequest) {
+    public void filter(final HttpRequest httpRequest, Channel channel) {
         if (filterHosts) {
             final List<String> hosts = httpRequest.getHeaders("Host");
             if (hosts != null) {
@@ -93,23 +94,23 @@ public class RegexHttpRequestFilter implements HttpRequestFilter {
                     final Matcher hostMatch = hostPattern.matcher(host);
                     if (hostMatch.find()) {
                         if (filterPaths) {
-                            filterPath(httpRequest);
+                            filterPath(httpRequest, channel);
                         } else {
-                            this.filter.filter(httpRequest);
+                            this.filter.filter(httpRequest, channel);
                         }
                     }
                 }
             }
         } else if (filterPaths) {
-            filterPath(httpRequest);
+            filterPath(httpRequest, channel);
         }
     }
 
-    private void filterPath(final HttpRequest httpRequest) {
+    private void filterPath(final HttpRequest httpRequest, Channel channel) {
         final String path = httpRequest.getUri();
         final Matcher pathMatch = pathPattern.matcher(path);
         if (pathMatch.matches()) {
-            this.filter.filter(httpRequest);
+            this.filter.filter(httpRequest, channel);
         }
     }
 }
