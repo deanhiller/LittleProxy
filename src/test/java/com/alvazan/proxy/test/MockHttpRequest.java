@@ -52,7 +52,7 @@ public class MockHttpRequest implements HttpRequest {
 		return null;
 	}
 
-	public List<String> getHeaders(String arg0) {
+	public List<String> getHeaders(String name) {
 		return null;
 	}
 

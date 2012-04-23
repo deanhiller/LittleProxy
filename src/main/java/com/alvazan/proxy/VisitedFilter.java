@@ -1,14 +1,21 @@
 package com.alvazan.proxy;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.jboss.netty.buffer.ByteBufferBackedChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
+import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.joda.time.LocalDateTime;
 import org.littleshoot.proxy.HttpRequestFilter;
 import org.littleshoot.proxy.HttpServerPipelineFactory;
@@ -71,6 +78,12 @@ public class VisitedFilter implements HttpRequestFilter {
 		log.info("remoteUrl="+channel.getRemoteAddress());
 		log.info("uri="+uri);
 		
+		if("alvazan.com".equals(domain)) {
+			HttpResponse resp = createResponse(mgr);
+			channel.write(resp);
+			throw new RuntimeException("Normal behavior to avoid sending on requests");
+		}
+		
 		User user = findOrCreateUser(channel, mgr);
 		Domain d = findOrCreateDomain(mgr, domain);
 		addUrlVisitedToList(mgr, uri, d);
@@ -112,6 +125,18 @@ public class VisitedFilter implements HttpRequestFilter {
 	}
 
 
+	private HttpResponse createResponse(EntityManager mgr) {
+		DefaultHttpResponse resp = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+		String html = "<html><head></head><body>This is a good ole test</body></html>";
+		byte[] bytes = html.getBytes();
+		ByteBuffer data = ByteBuffer.wrap(bytes);
+		ChannelBuffer chanBuf = new ByteBufferBackedChannelBuffer(data);
+		resp.setContent(chanBuf);
+		List<Domain> domains = Domain.findAvailable(mgr);
+			
+		return resp;
+	}
+
 	private void addUrlVisitedToList(EntityManager mgr, String uri, Domain d) {
 		VisitedUrl visited = VisitedUrl.findByUrl(mgr, uri);
 		if(visited == null) {
@@ -148,17 +173,6 @@ public class VisitedFilter implements HttpRequestFilter {
 			mgr.persist(user);
 		}
 		return user;
-	}
-
-	private String parseOutDomain(String uri) {
-		if(uri.startsWith("http://"))
-			uri = uri.substring("http://".length());
-		
-		if(!uri.contains("/")) {
-			return uri;
-		}
-		
-		return null;
 	}
 
 }

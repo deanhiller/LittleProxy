@@ -25,7 +25,7 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@Column(length=20, nullable=false)
+	@Column(length=20, nullable=false, unique=true)
 	private String fromAddress;
 	
 	@Column(length=30, nullable=true)

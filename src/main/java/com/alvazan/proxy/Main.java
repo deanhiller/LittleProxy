@@ -1,5 +1,8 @@
 package com.alvazan.proxy;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -12,7 +15,9 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		EntityManagerFactory factory = Persistence.createEntityManagerFactory("h2");
+		Map<String, String> props = new HashMap<String, String>();
+		props.put("hibernate.connection.url", "jdbc:h2:mem:test");
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("h2", props);
 		TimeNow timeSystem = new TimeNowImpl();
 		VisitedFilter filter = new VisitedFilter(factory, timeSystem );
 		DefaultHttpProxyServer server = new DefaultHttpProxyServer(8080, filter);
