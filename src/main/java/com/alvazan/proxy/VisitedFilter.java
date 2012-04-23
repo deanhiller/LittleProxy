@@ -78,6 +78,9 @@ public class VisitedFilter implements HttpRequestFilter {
 		log.info("remoteUrl="+channel.getRemoteAddress());
 		log.info("uri="+uri);
 		
+		if(domainExcluded(domain))
+			return;
+		
 		if("alvazan.com".equals(domain)) {
 			HttpResponse resp = createResponse(mgr);
 			channel.write(resp);
@@ -125,15 +128,30 @@ public class VisitedFilter implements HttpRequestFilter {
 	}
 
 
+	private boolean domainExcluded(String domain) {
+		if(domain.equals("maps.google.com"))
+			return true;
+		else if(domain.equals("maps.google.com"))
+			return true;
+		return false;
+	}
+
 	private HttpResponse createResponse(EntityManager mgr) {
+		List<Domain> domains = Domain.findAvailable(mgr);
+
 		DefaultHttpResponse resp = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-		String html = "<html><head></head><body>This is a good ole test</body></html>";
+		String html = "<html><head></head><body>This is the FIRST 40 results not done yet</br>";
+		
+		for(Domain d : domains) {
+			html += "Domain=<a href=\""+d.getDomain()+"\">"+d.getDomain()+"</a> </br>";
+		}
+		
+		String end = "</body></html>";
 		byte[] bytes = html.getBytes();
 		ByteBuffer data = ByteBuffer.wrap(bytes);
 		ChannelBuffer chanBuf = new ByteBufferBackedChannelBuffer(data);
-		resp.setContent(chanBuf);
-		List<Domain> domains = Domain.findAvailable(mgr);
-			
+		resp.setContent(chanBuf);		
+		
 		return resp;
 	}
 
