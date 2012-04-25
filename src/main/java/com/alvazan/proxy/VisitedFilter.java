@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alvazan.proxy.db.Domain;
+import com.alvazan.proxy.db.Timeworked;
 import com.alvazan.proxy.db.User;
 import com.alvazan.proxy.db.VisitedUrl;
 
@@ -87,7 +88,7 @@ public class VisitedFilter implements HttpRequestFilter {
 			throw new RuntimeException("Normal behavior to avoid sending on requests");
 		}
 		
-		User user = findOrCreateUser(channel, mgr);
+		User user = findOrCreateUser(channel, mgr, now);
 		Domain d = findOrCreateDomain(mgr, domain);
 		addUrlVisitedToList(mgr, uri, d);
 		
@@ -181,16 +182,39 @@ public class VisitedFilter implements HttpRequestFilter {
 	}
 
 
-	private User findOrCreateUser(Channel channel, EntityManager mgr) {
+	private User findOrCreateUser(Channel channel, EntityManager mgr, LocalDateTime now) {
 		InetSocketAddress remoteAddress = (InetSocketAddress) channel.getRemoteAddress();
 		String address = remoteAddress.getAddress().getHostAddress();
 		User user = User.findByIp(mgr, address);
 		if(user == null) {
 			user = new User();
 			user.setFromAddress(address);
+			user.setLastTimeWorked(now);
 			mgr.persist(user);
+			
+			Timeworked t = new Timeworked();
+			t.setTimeStamp(now);
+			t.setUser(user);
+			mgr.persist(user);
+		} else {
+			modifyLastTimeWorkedIfExceedsThreeMinutes(mgr, user, now);
 		}
 		return user;
+	}
+
+
+	private void modifyLastTimeWorkedIfExceedsThreeMinutes(EntityManager mgr, User user, LocalDateTime now) {
+		LocalDateTime lastTimeWorked = user.getLastTimeWorked();
+		LocalDateTime threeFromLastTime = lastTimeWorked.plusMinutes(3);
+		if(threeFromLastTime.isAfter(now))
+			return; //do not record right now
+		
+		//well, they made a new request in a new 3 minute window so we record it now
+		user.setLastTimeWorked(now);
+		Timeworked t = new Timeworked();
+		t.setUser(user);
+		t.setTimeStamp(now);
+		mgr.persist(t);
 	}
 
 }
