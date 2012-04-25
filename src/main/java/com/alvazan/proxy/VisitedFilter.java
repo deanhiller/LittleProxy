@@ -48,12 +48,12 @@ public class VisitedFilter implements HttpRequestFilter {
 			filter(httpRequest, channel, mgr);
 		} finally {
 			silentCommit(mgr);
-			slientClose(mgr);
+			silentClose(mgr);
 		}
 	}
 
 
-	private void slientClose(EntityManager mgr) {
+	public static void silentClose(EntityManager mgr) {
 		try {
 			mgr.close();
 		} catch(RuntimeException e) {
@@ -62,7 +62,7 @@ public class VisitedFilter implements HttpRequestFilter {
 	}
 
 
-	private void silentCommit(EntityManager mgr) {
+	public static void silentCommit(EntityManager mgr) {
 		try {
 			mgr.getTransaction().commit();
 		} catch(RuntimeException e) {
@@ -216,5 +216,7 @@ public class VisitedFilter implements HttpRequestFilter {
 		t.setTimeStamp(now);
 		mgr.persist(t);
 	}
+
+
 
 }

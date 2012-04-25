@@ -9,7 +9,7 @@ import javax.persistence.Persistence;
 import org.joda.time.LocalDateTime;
 import org.littleshoot.proxy.DefaultHttpProxyServer;
 
-public class Main {
+public class MainForProxy {
 
 	/**
 	 * @param args
@@ -24,7 +24,7 @@ public class Main {
 		server.start();
 	}
 	
-	private static class TimeNowImpl implements TimeNow {
+	public static class TimeNowImpl implements TimeNow {
 		public LocalDateTime getCurrentTime() {
 			return new LocalDateTime();
 		}
