@@ -79,20 +79,22 @@ public class WebPageScraper {
 		HtmlPage page = webClient.getPage(url);
 		String asXml = page.asXml();
 		log.info("xml="+asXml);
+
+		ScrapedInformation info = new ScrapedInformation();
+		List<String> domains = info.getDomains();
 		
-		findExtensions(asXml, ".net");
-		findExtensions(asXml, ".com");
-		findExtensions(asXml, ".biz");
+		findExtensions(asXml, ".net", domains);
+		findExtensions(asXml, ".com", domains);
+		findExtensions(asXml, ".biz", domains);
 		
 		if(asXml.contains("Advance America"))
 			log.info("we got it");
 		
-		ScrapedInformation info = new ScrapedInformation();
-		info.getDomains().add("somedomain that was scraped");
+
 		return null;
 	}
 
-	private void findExtensions(String asXml, String postfix) {
+	private void findExtensions(String asXml, String postfix, List<String> domains) {
 		int indexOf = asXml.indexOf(postfix);
 		int begin = indexOf - 100;
 		int end = indexOf + postfix.length();
